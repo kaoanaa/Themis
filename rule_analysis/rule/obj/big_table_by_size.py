@@ -11,13 +11,13 @@ def execute_rule(**kwargs):
         from information_schema.tables
         where table_schema='@username@'
         and CREATE_OPTIONS<>'partitioned'
-        and data_length>@table_size@
+        and round(data_length/1024/1024/1024,2)>@table_size@
         union all
         select concat(table_name,':',partition_name),round(data_length/1024/1024/1024,2)
         from information_schema.partitions
         where table_schema='@username@'
         and table_name not in (select table_name from information_schema.tables where table_schema='@username@' and CREATE_OPTIONS<>'partitioned')
-        and data_length>@table_size@"""
+        and round(data_length/1024/1024/1024,2)>@table_size@"""
     sql = sql.replace("@username@", username).replace("@table_size@", str(table_size))
     db_cursor.execute(sql)
     records = db_cursor.fetchall()
